@@ -299,11 +299,13 @@ class BillController extends Controller {
     const { ctx, app } = this;
     const { date = "" } = ctx.query;
     console.log("...", ctx.query);
+    let user_id;
+    const token = ctx.request.header.authorization;
+    const decode = await app.jwt.verify(token, app.config.jwt.secret);
     // 获取用户 user_id
-    const user_id = 1;
-    // 。。。
-    // 省略鉴权获取用户信息的代码
+    user_id = decode.id;
     try {
+      if (!decode) return;
       // 获取账单表中的账单数据
       const result = await ctx.service.bill.list(user_id);
       console.log(result);

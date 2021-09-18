@@ -9,7 +9,7 @@ const Controller = require("egg").Controller;
 
 class UploadController extends Controller {
   async upload() {
-    const { ctx } = this;
+    const { ctx, app } = this;
     // 需要前往 config/config.default.js 设置 config.multipart 的 mode 属性为 file
     let file = ctx.request.files[0];
 
@@ -17,6 +17,9 @@ class UploadController extends Controller {
     let uploadDir = "";
 
     try {
+      const token = ctx.request.header.authorization;
+      const decode = await app.jwt.verify(token, app.config.jwt.secret);
+      if (!decode) return;
       // ctx.request.files[0] 表示获取第一个文件，若前端上传多个文件则可以遍历这个数组对象
       let f = fs.readFileSync(file.filepath);
       // 1.获取当前日期
